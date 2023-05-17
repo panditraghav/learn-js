@@ -1,31 +1,30 @@
-// Implicit type conversion
-let num = 33.334 + "2";// Converts 33 into string "33"
-console.log("Type of num before parsing:-", typeof num, num) // String 33.3342
-num = Number(num)// Converting to a integer manually
-console.log("Type of num after parsing:-", typeof num, num) // number
+'use strict'
 
-if (typeof num === 'number') {
-    console.log(num.toFixed(8));// Methods in premitive types??
+Object.prototype.greet = function() {
+    console.log("Hello World")
 }
 
-const newNum = new Number(num)
-console.log('Type of newNum', typeof newNum) // Object
+const newObj = {}
 
-//Type of null and undefined
-console.log('Typeof null:-', typeof null)
-console.log('Typeof null:-', typeof undefined)
+const newArr = [] // Array is also a object
 
-function myFunc() {
-    return;
+// Function is also a object
+function newFunction() {
+
 }
-console.log("Type of myFunc()", typeof myFunc()) // undefined
 
-let name;
-console.log("Typeof name:- ", typeof name, name) // undefined
+const arrow = () => {
 
-const person = {
-    name: 'person 1',
 }
-person.age = 22
-console.log(person) // { name: 'person 1', age: 22 }
-console.log(Object.keys(person)) // [ name, age ]
+
+newObj.greet()
+newArr.greet()
+newFunction.greet()
+arrow.greet()
+
+const myObj = {
+    name: 'Tanaka'
+}
+console.log(myObj.name) // Tanaka
+delete myObj.name
+console.log(myObj.name) // undefined
