@@ -1,30 +1,18 @@
 'use strict'
+const person = {}
 
-Object.prototype.greet = function() {
-    console.log("Hello World")
-}
+let personName = "Ram"
+Object.defineProperty(person, 'name', {
+    name: 'Ram',
+    get: () => personName,
+    set: (value) => personName = value,
+    enumerable: true,
+    configurable: true,
+})
 
-const newObj = {}
+console.log(Object.keys(person)) // if enumerable: false => [] else => ['name']
 
-const newArr = [] // Array is also a object
+person.name = "Shyam"
 
-// Function is also a object
-function newFunction() {
-
-}
-
-const arrow = () => {
-
-}
-
-newObj.greet()
-newArr.greet()
-newFunction.greet()
-arrow.greet()
-
-const myObj = {
-    name: 'Tanaka'
-}
-console.log(myObj.name) // Tanaka
-delete myObj.name
-console.log(myObj.name) // undefined
+console.log(person) // {}
+console.log(person.name) // Shyam

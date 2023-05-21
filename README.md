@@ -1,104 +1,136 @@
-# Objects
+# Objects Static Methods
 
-In computer science, an object is a value in memory which is possibly referenced by an identifier. In JavaScript, objects are the only mutable values. Functions are, in fact, also objects with the additional capability of being callable.
-
-In JavaScript, objects can be seen as a collection of properties. It is used to store various keyed collections and more complex entities. With the object literal syntax, a limited set of properties are initialized; then properties can be added and removed.
-
-Property values can be values of any type, including other objects, which enables building complex data structures.
-
-Object can be created using `Object()` constructor or object literal `{}`.
+## `Object.assign()`
 
 ```javascript
-const person ={
-    name: 'person 1',
-}
-person.age = 22
-console.log(person) // { name: 'person 1', age: 22 }
-console.log(Object.keys(person)) // [ name, age ]
-```
+const src = { a: '10', b: 2 }
+const target = { c: 30, d: 20, a: 5 }
 
-Nearly all objects in JavaScript are instances of `Object`, a typical object inherits properties (including methods) from `Object.prototype`, although these properties may be shadowed (a.k.a. overridden).
-
-Changes to the `Object.prototype` object are seen by all objects through prototype chaining, unless the properties and methods subject to those changes are overridden further along the prototype chain.
-
-```javascript
-Object.prototype.greet = function() {
-    console.log("Hello World")
-}
-
-const newObj = {}
-
-const newArr = [] // Array is also a object
-
-// Function is also a object
-function newFunction() {}
-
-newObj.greet() // Hello World
-newArr.greet() // Hello World
-newFunction.greet() // Hello World
-```
-
-## Deleting property from object
-
-```javascript
-const myObj = {
-   name: 'Tanaka'
-}
-console.log(myObj.name) // Tanaka
-delete myObj.name
-console.log(myObj.name) // undefined
-```
-
-## Object type coercion
-
-JavaScript is a **weakly typed language**. This means that you can often use a value of one type where another type is expected, and the language will convert it to the right type for you.
-
-### Primitive coercion of objects
-
-This happens when a primitive value is expected but not given, for example `+` operator.
-
-```javascript
-const obj = {
-    name: 'My object'
-}
-console.log(obj + []) // [Object Object]
-```
-
-The `+` operator needs primitive values to operate on so first `obj` and `[]` is converted to primitive values.
-To convert to primitive values JavaScript calls some methods in following order:-
-
-#### 1. `[@@toPrimitive]()`
-If present must return a primitive, returning an object result in `TypeError.`
-
-#### 2. `toValue()`
-If `[@@toPrimitive]()` method is not present `toValue()` is called instead.
-
-#### 3. `toString()`
-If `[@@toPrimitive]()` and `toValue()` method is not present `toString()` is called instead.
-
-> If one of `toValue()` and `toString()` returns a object others value is used
-
-Neither `{}` nor `[]` have a `[@@toPrimitive]()` method. Both `{}` and `[]` inherit `valueOf()` from `Object.prototype.valueOf`, which returns the object itself. Since the return value is an object, it is ignored. Therefore, `toString()` is called instead. `{}.toString()` returns "[object Object]", while `[].toString()` returns "", so the result is their concatenation: "[object Object]".
-
-We can add a `[@@toPrimitive]()` method to our object to change it's behaviour.
-
-```javascript
-Object.defineProperty(obj, Symbol.toPrimitive, {
-    value: function() {
-        return 'myObject'
-    },
+// Non enumerable properties are not assigned
+Object.defineProperty(target, 'hello', {
+    value: 'World',
+    enumerable: false,
     writable: true,
-    enumerable: true,
-    configurable: true
+})
+console.log('Src:-', src)
+console.log('Target:-', target)
+console.log('Is hello enumerable:- ', target.propertyIsEnumerable('hello'))
+
+console.log("Object.keys(target)")
+console.log(Object.keys(target)) // [ c, d, a ]
+
+// Assigns property of target to src and returns src
+const newSrc = Object.assign(src, target) 
+console.log('Src:- ', src) // {a: 5 , b: 2, c: 30, d: 20}
+
+// Changing property of src doesn't change property of target ( they are different property and not a reference)
+```
+
+## `Object.create()`
+
+`Object.create()` gives more control over the property of object.
+
+### Syntax
+```javascript
+Object.create(proto)
+Object.create(proto, propertiesObject)
+
+```
+`propertiesObject` is same as second argument of `Object.defineProperty()`.
+
+### Creating a normal object
+```javascript
+const person = Object.create(Object.prototype, {
+    name: {
+        value: 'Ram',
+        enumerable: true,
+        configurable: false,
+        writable: false,
+    },
+    age: {
+        value: 16,
+        enumerable: true,
+        configurable: false,
+        writable: true,
+    }
 })
 
-console.log(obj + []) // myObject
+// person.name = 'Shyam'  (Throws TypeError: Cannot assign readonly property)
+person.age++
+
+console.log(person) // { name: 'Ram', age: 17}
+```
+
+You can use `Object.create()` to mimic the behavior of the new operator.
+
+```javascript
+function Constructor() {}
+o = new Constructor();
+// Is equivalent to:
+o = Object.create(Constructor.prototype);
+```
+
+## `Object.defineProperty()`
+
+```javascript
+Object.defineProperty(obj, prop, descriptor)
+```
+
+### Types of descriptors
+
+There can be two types of descriptors **data descriptor** and **accessor descriptor**
+
+#### 1. Data Descriptor
+```javascript
+'use strict'
+const person = {}
+
+Object.defineProperty(person, 'name', {
+    value: 'Ram',
+    /*
+    *  configurable (default => false)
+    *  when set false 
+    *       1. type of peoperty is cannot be canged between data nd accessor property.
+    *       2. property cannot be deleted
+    *       2. other attributes of it's descriptor cannot be changed
+    */
+    configurable: false,
+    enumerable: false, // can it be show in for..of or for..in loop and Object.keys()
+    writable: true, // can value be changed
+})
+
+Object.defineProperty(person, 'name', {
+    value: 'Shyam', // Value can be changed because it's writable
+    // configurable: true, => This will throw TypeError: Cannot redifine property
+})
+
+console.log(Object.keys(person)) // if enumerable: false => [] else => ['name']
+
+console.log(person) // { name: 'Shyam' }
+```
+#### 2. Data accessor
+
+```javascript
+'use strict'
+const person = {}
+
+let personName = "Ram"
+Object.defineProperty(person, 'name', {
+    name: 'Ram',
+    get: () => personName,
+    set: (value) => personName = value,
+    enumerable: true,
+    configurable: true,
+})
+
+console.log(Object.keys(person)) // if enumerable: false => [] else => ['name']
+
+person.name = "Shyam"
+
+console.log(person) // {}
+console.log(person.name) // Shyam
 ```
 
 ## Source:-
 
-[MDN JavaScript data types and data structures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures)
-
 [MDN Standard Builtin Objects > Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
-
-[MDN Delete Operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete)
