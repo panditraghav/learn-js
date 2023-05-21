@@ -1,18 +1,8 @@
 'use strict'
-const person = {}
 
-let personName = "Ram"
-Object.defineProperty(person, 'name', {
-    name: 'Ram',
-    get: () => personName,
-    set: (value) => personName = value,
-    enumerable: true,
-    configurable: true,
-})
+const factorial = function fact(num) {
+    if (num === 0) return 1;
+    return num * factorial(num - 1)
+}
 
-console.log(Object.keys(person)) // if enumerable: false => [] else => ['name']
-
-person.name = "Shyam"
-
-console.log(person) // {}
-console.log(person.name) // Shyam
+console.log(factorial(5))
